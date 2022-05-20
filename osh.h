@@ -3,7 +3,10 @@
 #include <string.h>
 
 #define MALLOC_ERROR_EXIT 1
-#define BUFFER_LIMIT_ERROR_EXIT 2
+#define REALLOC_ERROR_EXIT 2
+
+#define safeFree(p) saferFree((void**)&(p))
+
 
 #define MAX_LINE 80 /* The maximum length command */
 
