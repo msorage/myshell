@@ -2,23 +2,8 @@
 #include <unistd.h>
 #include "osh.c"
 
-#define MAX_LINE 80 /* The maximum length command */
-
-void osh_prompt(void){
-
-    char *args[MAX_LINE/2 + 1]; /* command line arguments */
-    int should_run = 1; /* flag to determine when to exit program */
-
-
-    while(should_run){
-        
-        printf("osh> ");
-        //if (fgets(args, MAX_LINE, stdin)==NULL){
-        //prinft("Error");
-        //}
-    }
-
-}
+char** osh_parseLine(char* line);
+int osh_executeCmd(char** args);
 
 int main(void){
 
