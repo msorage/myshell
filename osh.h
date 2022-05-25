@@ -10,6 +10,9 @@
 
 #define MAX_LINE 80 /* The maximum length command */
 
+#define TOK_BUFSIZE 20
+#define TOK_DELIM " \t\r\n\a"
+
 void osh_prompt(void);
 char* osh_readLine();
 char** osh_parseLine(char* line);
