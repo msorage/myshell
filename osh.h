@@ -4,6 +4,8 @@
 
 #define MALLOC_ERROR_EXIT 1
 #define REALLOC_ERROR_EXIT 2
+#define EXEC_ERROR_EXIT 3
+#define FORK_ERROR_EXIT 4
 
 #define safeFree(p) saferFree((void**)&(p))
 
@@ -16,4 +18,5 @@
 void osh_prompt(void);
 char* osh_readLine();
 char** osh_parseLine(char* line);
+int osh_launch(char** args);
 int osh_executeCmd(char** args);

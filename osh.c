@@ -97,8 +97,30 @@ char** osh_parseLine(char* line){
             }
             tokens = newTokens;
         }
+        token = strtok(NULL, TOK_DELIM);
     }
     tokens[currentPosition] = NULL;
     return tokens;
 }
 
+int osh_launch(char** args){
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+    if(pid == 0){ //Child process
+    if(execvp(args[0], args) == -1){
+        perror("osh");
+    }
+    exit(EXEC_ERROR_EXIT);
+
+    } else if(pid > 0){ //Forking error
+        perror("osh");
+        exit(FORK_ERROR_EXIT);
+    } else{ //Parent process
+        do{
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+    return 1;
+}
