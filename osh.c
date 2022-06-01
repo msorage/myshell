@@ -1,11 +1,19 @@
 #include "osh.h"
 
+void saferFree(char** ptr){
+    if(ptr != NULL && *ptr != NULL){
+        free(*ptr);
+        *ptr = NULL;
+    }
+} 
+
+
 
 void osh_prompt(void){
 
     char** args;
     int shouldRun = 1; /* flag to determine when to exit program */
-    char* line;
+    char* line;  
 
     while(shouldRun){
         
@@ -19,6 +27,8 @@ void osh_prompt(void){
     }
 
 }
+
+
 
 char* osh_readLine(){
 
@@ -60,9 +70,57 @@ char* osh_readLine(){
     return buffer;
 }
 
-void saferFree(char** ptr){
-    if(ptr != NULL && *ptr != NULL){
-        free(*ptr);
-        *ptr = NULL;
+char** osh_parseLine(char* line){
+
+    int bufferSize = TOK_BUFSIZE, sizeIncrement = 20, currentPosition = 0;
+    char* token;
+    char** tokens = (char**)malloc(bufferSize * sizeof(char*));
+
+    if(tokens == NULL){
+        fprintf(stderr, "osh: malloc error\n");
+        exit(MALLOC_ERROR_EXIT);
     }
+
+    token = strtok(line, TOK_DELIM);
+    while(token != NULL){
+        tokens[currentPosition] = token;
+        currentPosition++;
+
+        if(currentPosition >= bufferSize){
+            bufferSize += sizeIncrement;
+            char** newTokens = realloc(tokens, bufferSize * sizeof(char*));
+
+            if(newTokens == NULL){
+                //remember to free tokens in a safe way
+                fprintf(stderr, "osh: realloc error\n");
+                exit(REALLOC_ERROR_EXIT);
+            }
+            tokens = newTokens;
+        }
+        token = strtok(NULL, TOK_DELIM);
+    }
+    tokens[currentPosition] = NULL;
+    return tokens;
+}
+
+int osh_launch(char** args){
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+    if(pid == 0){ //Child process
+    if(execvp(args[0], args) == -1){
+        perror("osh");
+    }
+    exit(EXEC_ERROR_EXIT);
+
+    } else if(pid > 0){ //Forking error
+        perror("osh");
+        exit(FORK_ERROR_EXIT);
+    } else{ //Parent process
+        do{
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+    return 1;
 }
